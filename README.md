@@ -16,6 +16,7 @@
 
 - **[Use cases, suitability checks & limitations (English)](docs/USE-CASES-AND-LIMITATIONS.en.md)**
 - **[适用场景、局限性与使用边界（简体中文）](docs/USE-CASES-AND-LIMITATIONS.zh-CN.md)**
+- **[Bilingual edition / 中英双语合并版](docs/USE-CASES-AND-LIMITATIONS.md)**
 
 
 ## What is included
@@ -59,6 +60,26 @@ python -m pytest -q
 4. The agent fetches and interprets checkpoints, proposes an adjustment, confirms it was actually applied and verifies later observations.
 
 **Not included by default:** automatic email/chat push, hosted long-running execution, production-grade authentication, guaranteed achievement of a goal, generic MIMO actuation, verified industrial deployment.
+
+## Theoretical Reference / 理论参考
+
+**English**
+
+The conceptual foundation of FCC Control Studio draws on classical and modern feedback control theory, with reference to the following textbook:
+
+Phillips, C. L., & Parr, J. M. (2011). *Feedback Control Systems* (5th ed.). Prentice Hall / Pearson. ISBN: 9780131866140.
+
+FCC Control Studio is an independently developed software framework that extends feedback control concepts to general-purpose AI workflows, goal quantification, observation, evaluation, and iterative improvement.
+
+**中文**
+
+FCC Control Studio 的理论设计参考了经典与现代反馈控制理论，其中包括以下教材：
+
+Charles L. Phillips、John M. Parr 著，《Feedback Control Systems》（《反馈控制系统》第五版），Prentice Hall / Pearson，2011 年，ISBN：9780131866140。
+
+FCC Control Studio 是独立开发的通用软件框架，尝试将反馈控制理论中的目标设定、状态观测、偏差分析与闭环修正等思想，扩展至 AI 工作流、目标量化及持续优化等应用场景。
+
+本项目并非上述教材的官方实现，也不代表获得作者或出版社的认可或授权。
 
 ## License and attribution
 
