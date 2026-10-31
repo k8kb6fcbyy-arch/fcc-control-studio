@@ -11,7 +11,7 @@
 - Included: `fcc-core/`, `fcc-skill/`, first-use guide, release notes, documentation, GitHub Actions test workflow, custom license and origin instructions.
 - Excluded: development caches, SQLite DB/WAL, temporary files, compiled artifacts, old development log records.
 - No obvious credential/private-key patterns in release sources during targeted text scanning (not equivalent to comprehensive independent secret scanning).
-- Removed named-book references from published source and documentation as requested. Mathematical methods and actual capability boundaries are still described.
+- Earlier drafts removed named-book references from published source and documentation as requested. This release restores a single textbook citation (Phillips & Parr, 2011) as a low-profile Theoretical Reference note at the end of `README.md`, with an explicit statement that the project is not an official implementation and carries no endorsement from the authors or publisher. Mathematical methods and actual capability boundaries are still described.
 
 ## FCC 1.5 additions
 

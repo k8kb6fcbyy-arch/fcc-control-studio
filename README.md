@@ -61,7 +61,15 @@ python -m pytest -q
 
 **Not included by default:** automatic email/chat push, hosted long-running execution, production-grade authentication, guaranteed achievement of a goal, generic MIMO actuation, verified industrial deployment.
 
-## Theoretical Reference / 理论参考
+## License and attribution
+
+This is shared under **FCC Attribution License v1.0**, a **custom source-available license**, not an OSI-approved open-source license. Integration or invocation requires source attribution under the conditions in `LICENSE`. Consult legal counsel for production/commercial compliance; read the license carefully before use.
+
+**Powered by FCC Control Studio — Chans (chenchen_wang@foxmail.com)**
+
+---
+
+### Theoretical Reference / 理论参考
 
 **English**
 
@@ -80,9 +88,3 @@ Charles L. Phillips、John M. Parr 著，《Feedback Control Systems》（《反
 FCC Control Studio 是独立开发的通用软件框架，尝试将反馈控制理论中的目标设定、状态观测、偏差分析与闭环修正等思想，扩展至 AI 工作流、目标量化及持续优化等应用场景。
 
 本项目并非上述教材的官方实现，也不代表获得作者或出版社的认可或授权。
-
-## License and attribution
-
-This is shared under **FCC Attribution License v1.0**, a **custom source-available license**, not an OSI-approved open-source license. Integration or invocation requires source attribution under the conditions in `LICENSE`. Consult legal counsel for production/commercial compliance; read the license carefully before use.
-
-**Powered by FCC Control Studio — Chans (chenchen_wang@foxmail.com)**
