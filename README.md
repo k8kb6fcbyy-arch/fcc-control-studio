@@ -1,12 +1,78 @@
 # FCC Control Studio
 
-**Universal goal → observation → control → verification framework, with an agent-facing Skill and an AI Bootstrap.**
+### Beyond Execution. Toward Continuous Improvement.
 
-**Creator & maintainer:** Chans · **Contact:** chenchen_wang@foxmail.com  
-**Source credit:** Powered by FCC Control Studio — Chans (chenchen_wang@foxmail.com)
+**Define. Observe. Adjust. Verify.** · **定义目标 · 观察状态 · 调整策略 · 验证结果。**
 
 > Status: development framework / research prototype. The HTTP service is local-only and unauthenticated; do not expose it to the internet or use it for unvalidated physical automation.
 
+AI is changing how we interact with software.
+
+In the future, we may no longer need a separate app for every task. Instead, we could simply describe our goals, and AI agents would organize the tools needed to achieve them.
+
+But one important question remains:
+
+**How do we know whether AI is actually moving toward the goal? And how can it continuously improve?**
+
+This is what FCC Control Studio aims to address.
+
+FCC consists of two core components:
+
+- **AI Agent Skill:** Helps AI agents understand user requirements, define measurable goals, and configure monitoring, feedback cycles, and verification.
+- **FCC Engine:** Provides general-purpose feedback control capabilities, including state observation, error analysis, iterative adjustment, and outcome verification.
+
+FCC is designed to be independent of specific AI models, industries, or applications.
+
+It can support software quality improvement, workflow automation, industrial monitoring, and other measurable scenarios.
+
+FCC does not promise to achieve every goal automatically. Instead, it provides a framework for **clear objectives, reliable observations, controlled adjustments, and verifiable results.**
+
+**Moving AI beyond one-time execution toward continuous, verifiable improvement.**
+
+**FCC Control Studio**
+
+*Define. Observe. Adjust. Verify.*
+
+Created by Chans · Contact: chenchen_wang@foxmail.com
+
+---
+
+## 中文
+
+### 让 AI 不止于执行，更懂得反馈与改进。
+
+**定义目标 · 观察状态 · 调整策略 · 验证结果。**
+
+AI 正在改变软件的使用方式。
+
+未来，我们或许不再需要为每个需求寻找一款 App，而是直接向 AI 描述目标，由 AI 自主组织工具并完成任务。
+
+但一个关键问题仍然存在：
+
+**AI 能够执行任务，如何判断结果是否真正接近目标？又该如何持续改进？**
+
+这正是 FCC Control Studio 希望解决的问题。
+
+FCC 由两个核心模块组成：
+
+- **AI Agent Skill**：引导 AI 理解用户需求，将目标转化为可衡量的指标，配置观测方式、反馈周期与验证规则。
+- **FCC Engine**：提供通用反馈控制能力，通过状态观测、偏差分析、策略调整与效果验证，支持持续的闭环优化。
+
+FCC 不绑定特定 AI、行业或应用程序。
+
+从软件质量、自动化流程，到工业状态监测及其他可量化场景，都可以根据实际条件接入。
+
+它不承诺自动实现任何目标，而是尝试建立一套**目标明确、数据可信、调整可控、结果可验证**的通用反馈机制。
+
+**让 AI 从一次性的任务执行，走向持续、可验证的改进。**
+
+**FCC Control Studio**
+
+*定义目标 · 观察状态 · 调整策略 · 验证结果。*
+
+Created by Chans · Contact: chenchen_wang@foxmail.com
+
+---
 
 ## Where FCC fits / 适用场景与局限性
 
