@@ -1,0 +1,53 @@
+FCC Attribution License v1.0 (custom source-available license)
+Copyright (c) 2026 Chans. All rights reserved except as expressly granted below.
+Contact: chenchen_wang@foxmail.com
+
+NOTICE: This is a custom license, not an OSI-approved open-source license.
+For legally critical deployments, obtain advice from a qualified lawyer.
+
+1. Permission. Subject to all conditions below, the Licensor grants you a
+non-exclusive, worldwide, royalty-free permission to view, use, run, modify,
+copy, integrate, and distribute this software and its associated FCC Skill,
+for personal, internal, educational, and commercial purposes.
+
+2. Attribution upon use or invocation. Whenever you use or invoke any portion
+of FCC Core, its API, SDK, or FCC Skill (directly or via another AI agent,
+workflow, application, or service), you must provide the following attribution:
+    "Powered by FCC Control Studio — Chans (chenchen_wang@foxmail.com)"
+For user-facing products or AI-generated user-facing results that rely on FCC,
+show this text in the product's Credits/About/Documentation or in an accessible
+result footer/provenance section. A permanently accessible credits location is
+sufficient for repeated calls within the same product; you are not required to
+repeat the text on each individual HTTP request. For command-line, internal,
+or machine-only integrations, put it in the project README, integration docs,
+or machine-readable provenance metadata supplied with outputs. A mere private
+copy with no external interface must retain this license and attribution in
+its copy of the source tree. Do not misleadingly claim Chans endorses you.
+
+3. Redistribution and modifications. Preserve this LICENSE and the NOTICE
+and attribution statements in redistributed source, packaged code, and
+copies or adaptations of the FCC Skill. Identify substantial changes and
+your own authorship separately. Do not delete or obscure the original
+attribution. You may offer your contributions under additional terms only
+if those terms do not remove the obligations of this license for FCC code.
+
+4. Third parties. This license covers only rights that the Licensor can
+lawfully grant. Third-party components remain under their own licenses; you
+must independently comply with those licenses.
+
+5. No warranty. The software is provided "AS IS" without warranty of any
+kind, express or implied, to the fullest extent permitted by law. Control
+algorithms are not warranted suitable for equipment, health, financial, or
+other high-risk applications. The user assumes responsibility for validation,
+configuration, authorization, and safety measures.
+
+6. Liability. To the fullest extent permitted by applicable law, the
+Licensor is not liable for claims, damages, or losses arising out of use,
+modification, deployment, or inability to use this software.
+
+7. Rights reserved. No trademarks, names, or logos are licensed except for
+the accurate attribution required above. All permissions not expressly
+granted remain reserved.
+
+This license is an initial author-provided legal template and has not been
+certified for enforceability in any particular jurisdiction.

@@ -1,0 +1,27 @@
+{
+  "name": "generic-adaptive-arx-demo-not-production",
+  "enabled": false,
+  "goals": [
+    {"goal_id":"g1","target_variable":"metric_1","direction":"approach",
+     "setpoint":{"kind":"value","value":2.0},"tolerance":0.05}
+  ],
+  "observations": [
+    {"metric_id":"metric_1","source":"manual","unit":"dimensionless",
+     "sampling_interval":1.0,"freshness_limit":3.0,"missing_policy":"skip"}
+  ],
+  "controller": {
+    "kind":"adaptive_arx", "strategy_version":1,
+    "params":{
+      "expected_gain_sign":1, "trusted_applied_input":false,
+      "theta0":[0.8,0.2,0.0], "P0":[[100.0,0.0,0.0],[0.0,100.0,0.0],[0.0,0.0,100.0]],
+      "forgetting_factor":0.995,"min_samples":15,
+      "min_abs_gain":0.02,"max_abs_a":2.0,"max_abs_gain":50.0,
+      "min_input_span":0.1
+    }
+  },
+  "scheduler":{"mode":"manual","interval_seconds":1.0},
+  "actuator":{"permission_mode":"require_approval","adapter":"manual",
+              "action_range":[-5.0,5.0],"max_step":0.5,"max_retries":0},
+  "verification":{"delay_cycles":1,"delay_seconds":0.0,"noise_k":2.0},
+  "metadata":{"warning":"Always monitor-only unless verified applied actuator feedback exists. Do not flip trusted_applied_input without reliable actual u[k] for each observed transition; manual adapter is only a stub."}
+}

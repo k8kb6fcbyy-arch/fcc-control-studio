@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FCC · 通用反馈控制核心</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c2230; --line:#2a3340;
+    --fg:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --ok:#3fb950;
+    --warn:#d29922; --bad:#f85149; --guard:#bc8cff;
+    --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+  header{display:flex;align-items:center;gap:12px;padding:12px 18px;
+         border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5}
+  header h1{font-size:15px;margin:0;font-weight:600;letter-spacing:.5px}
+  header .tag{font:11px var(--mono);color:var(--muted);border:1px solid var(--line);
+              padding:2px 6px;border-radius:4px}
+  header .spacer{flex:1}
+  main{display:grid;grid-template-columns:280px 1fr;gap:14px;padding:14px;align-items:start}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
+  .panel h2{font-size:13px;margin:0 0 10px;color:var(--muted);font-weight:600;
+            text-transform:uppercase;letter-spacing:.6px}
+  .loop-item{padding:8px 10px;border-radius:6px;cursor:pointer;border:1px solid transparent;
+             margin-bottom:6px;background:var(--panel2)}
+  .loop-item:hover{border-color:var(--accent)}
+  .loop-item.active{border-color:var(--accent);background:#1b2740}
+  .loop-item .name{font-weight:600}
+  .loop-item .meta{font:11px var(--mono);color:var(--muted)}
+  button{background:var(--panel2);color:var(--fg);border:1px solid var(--line);
+         border-radius:6px;padding:6px 12px;cursor:pointer;font:13px inherit}
+  button:hover{border-color:var(--accent)}
+  button.primary{background:#1f6feb;border-color:#1f6feb}
+  button.primary:hover{background:#2b7ff5}
+  button.ok{border-color:var(--ok);color:var(--ok)}
+  button.bad{border-color:var(--bad);color:var(--bad)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  input,select,textarea{background:#0b0f14;color:var(--fg);border:1px solid var(--line);
+        border-radius:6px;padding:6px 8px;font:13px var(--mono);width:100%}
+  label{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .stat{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+  .stat .box{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
+             padding:8px 12px;min-width:120px}
+  .stat .box .k{font:11px var(--mono);color:var(--muted)}
+  .stat .box .v{font:16px var(--mono);font-weight:600}
+  #chart{width:100%;height:340px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase}
+  .mono{font-family:var(--mono)}
+  .pill{display:inline-block;padding:1px 7px;border-radius:10px;font:11px var(--mono);
+        border:1px solid var(--line)}
+  .pill.ok{color:var(--ok);border-color:var(--ok)}
+  .pill.warn{color:var(--warn);border-color:var(--warn)}
+  .pill.bad{color:var(--bad);border-color:var(--bad)}
+  .pill.guard{color:var(--guard);border-color:var(--guard)}
+  .muted{color:var(--muted)}
+  .hidden{display:none!important}
+  details summary{cursor:pointer;color:var(--muted);font-size:12px;margin-top:10px}
+  .cap-row.disabled{opacity:.45}
+  .cap-row.disabled .st{color:var(--bad)}
+  #toast{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:99}
+  #toast div{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--accent);
+             padding:8px 12px;border-radius:6px;font-size:12px;max-width:420px}
+  #toast div.err{border-left-color:var(--bad)}
+  .timeline{max-height:300px;overflow:auto}
+  .tl-item{display:grid;grid-template-columns:120px 90px 1fr;gap:8px;font:11px var(--mono);
+           padding:4px 0;border-bottom:1px dashed var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <h1>FCC · 通用反馈控制核心</h1>
+  <span class="tag" id="healthTag">连接中…</span>
+  <span class="spacer"></span>
+  <span class="tag" id="capTag">能力台账加载中</span>
+  <button id="refreshBtn">刷新</button>
+</header>
+
+<main>
+  <!-- 左栏 -->
+  <section>
+    <div class="panel">
+      <h2>控制回路</h2>
+      <div id="loopList"><div class="muted">暂无</div></div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h2>新建回路</h2>
+      <label>名称</label>
+      <input id="f_name" value="generic-feedback-loop" />
+      <div class="row">
+        <div>
+          <label>目标变量</label>
+          <input id="f_var" value="metric_1" />
+        </div>
+        <div>
+          <label>目标值</label>
+          <input id="f_sp" value="1" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>容差</label>
+          <input id="f_tol" value="1" />
+        </div>
+        <div>
+          <label>控制器</label>
+          <select id="f_ctrl">
+            <option value="threshold">threshold（阈值 · engineered，反馈结构参考 classical）</option>
+            <option value="monitor">monitor（只看不做 · engineered）</option>
+            <option value="rule">rule（规则表 · engineered）</option>
+            <option value="ai_assisted">ai_assisted（AI 建议 · engineered）</option>
+            <option value="human_in_loop">human_in_loop（人工决策 · engineered）</option>
+            <option value="pid">pid（已实现 SISO · classical）</option>
+            <option value="mpc">mpc（已实现 SISO；需专家 JSON 模型）</option>
+            <option value="adaptive_arx">adaptive_arx（带保护；需专家 JSON 配置）</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>权限模式</label>
+          <select id="f_perm">
+            <option value="auto">auto</option>
+            <option value="require_approval" selected>require_approval</option>
+            <option value="suggest_only">suggest_only</option>
+          </select>
+        </div>
+        <div>
+          <label>调度</label>
+          <select id="f_sched">
+            <option value="manual">manual</option>
+            <option value="fixed" selected>fixed</option>
+            <option value="event">event</option>
+            <option value="threshold">threshold</option>
+            <option value="adaptive">adaptive（调频，不调控制律）</option>
+            <option value="cron">cron（默认每小时，其他规则用 JSON）</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>周期（秒）</label>
+          <input id="f_interval" value="2" />
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <label style="display:flex;align-items:center;gap:6px;margin:0">
+            <input type="checkbox" id="f_sim" checked style="width:auto" />
+            <span>挂模拟对象</span>
+          </label>
+        </div>
+      </div>
+      <details>
+        <summary>专家模式（直接编辑配置 JSON）</summary>
+        <textarea id="f_json" rows="12" spellcheck="false"></textarea>
+        <div class="muted" style="font-size:11px;margin-top:6px">填了 JSON 就以 JSON 为准</div>
+        <table style="margin-top:8px">
+          <thead><tr><th>设置项</th><th>theory_source</th></tr></thead>
+          <tbody>
+            <tr><td>PID 参数 <span class="mono">Kp/Ki/Kd</span></td>
+                <td><span class="pill ok">classical</span></td></tr>
+            <tr><td>状态空间 A/B/C</td>
+                <td><span class="pill ok">classical</span></td></tr>
+            <tr><td>观测器 / 状态估计</td>
+                <td><span class="pill ok">classical</span></td></tr>
+            <tr><td>线性稳定性（特征值/Lyapunov）；其他判据仅理论主题</td>
+                <td><span class="pill ok">classical</span></td></tr>
+            <tr><td>补偿器 / 超前滞后校正</td>
+                <td><span class="pill ok">classical</span></td></tr>
+            <tr><td>MPC / 滚动优化</td>
+                <td><span class="pill warn">external:优化控制</span></td></tr>
+            <tr><td>卡尔曼滤波（线性 KF + SDK EKF/UKF）</td>
+                <td><span class="pill warn">external:随机控制</span></td></tr>
+            <tr><td>自适应调度（只调整检查频率）</td>
+                <td><span class="pill guard">engineered</span></td></tr>
+            <tr><td>死区 / 迟滞 / 冷却</td>
+                <td><span class="pill guard">engineered</span></td></tr>
+            <tr><td>振荡检测 / 审批 / 审计 / 回滚</td>
+                <td><span class="pill guard">engineered</span></td></tr>
+          </tbody>
+        </table>
+        <div class="muted" style="font-size:11px;margin-top:6px">
+          经典稳定性结论仅适用于已验证模型；书内学术条目不等于本软件所有对应判据都已实现。标 <span class="pill guard">engineered</span> 或
+          <span class="pill warn">external:</span> 的项没有数学保证，只有工程经验与对照实验；
+          稳定性判据要求已知传递函数或状态方程，对本项目的 AI 工作流场景不适用。
+        </div>
+      </details>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="primary" id="createBtn">创建</button>
+        <button id="exampleBtn">填入示例</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h2>能力台账</h2>
+      <table><tbody id="capBody"></tbody></table>
+    </div>
+  </section>
+
+  <!-- 右栏 -->
+  <section>
+    <div class="panel">
+      <div id="loopHeader" class="muted">未选择回路</div>
+      <div class="stat" id="stats"></div>
+      <div class="stat" style="margin-bottom:0">
+        <button id="runBtn" class="primary" disabled>手动跑一轮</button>
+        <button id="startBtn" disabled>启动</button>
+        <button id="pauseBtn" disabled>暂停</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h2>趋势（目标线 / 观测值 / 误差 / 干预标记）</h2>
+      <div id="chart"></div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h2>待审批动作 <span class="pill warn" id="pendingCount">0</span></h2>
+      <table>
+        <thead><tr><th>ID</th><th>来源</th><th>目标</th><th>建议值</th><th>风险</th><th>原因</th><th>操作</th></tr></thead>
+        <tbody id="pendingBody"><tr><td colspan="7" class="muted">无</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h2>历史时间线</h2>
+      <div class="timeline" id="timeline"><div class="muted">暂无</div></div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h2>最近一轮详情</h2>
+      <pre class="mono" id="cycleDetail" style="max-height:320px;overflow:auto;font-size:11px;margin:0"></pre>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let currentLoop = null;
+let chart = null;
+let refreshTimer = null;
+
+function toast(msg, isErr){
+  const d = document.createElement('div');
+  if(isErr) d.className = 'err';
+  d.textContent = msg;
+  $('toast').appendChild(d);
+  setTimeout(()=>d.remove(), 5000);
+}
+
+async function api(path, opts){
+  const res = await fetch(path, Object.assign({headers:{'Content-Type':'application/json'}}, opts||{}));
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch(e){ data = {raw:text}; }
+  if(!res.ok){
+    const detail = (data && data.detail) ? JSON.stringify(data.detail) : text;
+    throw new Error(`${res.status} ${detail}`);
+  }
+  return data;
+}
+
+/* ---------------- 能力台账 ---------------- */
+async function loadCapabilities(){
+  try{
+    const cap = await api('/api/capabilities');
+    const rows = Object.entries(cap.modules).map(([k,v])=>{
+      const dis = v.status !== 'implemented';
+      const label = v.status === 'implemented' ? '已实现'
+                  : (v.status === 'interface_only' ? '仅接口·未实现' : '未实现');
+      const src = v.theory_source || '';
+      const srcCls = src.startsWith('classical:') ? 'ok'
+                   : (src.startsWith('external:') ? 'warn' : 'guard');
+      return `<tr class="cap-row ${dis?'disabled':''}">
+        <td class="mono">${escapeHtml(k)}</td>
+        <td class="st">${label}</td>
+        <td><span class="pill ${srcCls}">${escapeHtml(src)}</span></td></tr>
+        <tr class="cap-row ${dis?'disabled':''}"><td colspan="3" class="muted"
+          style="font-size:11px;padding-top:0">${escapeHtml(v.note)}</td></tr>`;
+    }).join('');
+    $('capBody').innerHTML = rows;
+    const c = cap.counts;
+    const bySrc = {classical:0, external:0, engineered:0};
+    Object.values(cap.modules).forEach(m=>{
+      const s = m.theory_source || 'engineered';
+      bySrc[s.startsWith('classical:') ? 'classical' : (s.startsWith('external:') ? 'external' : 'engineered')]++;
+    });
+    $('capTag').textContent = `已实现 ${c.implemented} · 仅接口 ${c.interface_only} · 未实现 ${c.not_implemented}`
+      + ` · 经典控制理论 ${bySrc.book}/扩展方法 ${bySrc.external}/工程 ${bySrc.engineered}`;
+  }catch(e){ $('capTag').textContent = '能力台账加载失败'; }
+}
+
+/* ---------------- loop 列表 ---------------- */
+async function loadLoops(){
+  const data = await api('/api/loops');
+  const list = data.loops;
+  if(!list.length){
+    $('loopList').innerHTML = '<div class="muted">暂无，先在下面建一个</div>';
+    return;
+  }
+  $('loopList').innerHTML = list.map(l=>`
+    <div class="loop-item ${l.id===currentLoop?'active':''}" data-id="${l.id}">
+      <div class="name">${escapeHtml(l.name)}</div>
+      <div class="meta">${l.id.slice(0,16)}… · ${l.enabled?'运行中':'已暂停'}</div>
+    </div>`).join('');
+  document.querySelectorAll('.loop-item').forEach(el=>{
+    el.onclick = ()=>{ currentLoop = el.dataset.id; loadLoops(); loadState(); };
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------------- 状态 ---------------- */
+async function loadState(){
+  if(!currentLoop) return;
+  try{
+    const st = await api('/api/loops/' + currentLoop);
+    renderHeader(st);
+    renderStats(st);
+    renderChart(st);
+    renderPending(st.pending_approvals);
+    renderTimeline(st.history);
+    const last = st.last_cycle;
+    $('cycleDetail').textContent = last ? JSON.stringify(last, null, 2) : '还没有跑过周期';
+    $('runBtn').disabled = false;
+    $('startBtn').disabled = st.enabled;
+    $('pauseBtn').disabled = !st.enabled;
+  }catch(e){
+    toast('读取状态失败: '+e.message, true);
+  }
+}
+
+const KIND_THEORY = {
+  monitor:'engineered', threshold:'engineered', rule:'engineered',
+  ai_assisted:'engineered', human_in_loop:'engineered',
+  pid:'classical', mpc:'external:优化控制',adaptive_arx:'external:自适应控制',
+};
+
+function renderHeader(st){
+  const c = st.config;
+  const ctrl = c.controller.kind;
+  const impl = ['monitor','threshold','rule','ai_assisted','human_in_loop','pid','mpc','adaptive_arx'].includes(ctrl);
+  const src = KIND_THEORY[ctrl] || 'engineered';
+  const srcCls = src.startsWith('classical:') ? 'ok'
+               : (src.startsWith('external:') ? 'warn' : 'guard');
+  $('loopHeader').innerHTML = `
+    <div style="font-size:16px;font-weight:600">${escapeHtml(st.name)}
+      ${st.enabled?'<span class="pill ok">运行中</span>':'<span class="pill">已暂停</span>'}
+      ${impl?'':`<span class="pill bad">${ctrl} 未实现</span>`}
+      <span class="pill ${srcCls}">${escapeHtml(src)}</span>
+    </div>
+    <div class="muted mono" style="font-size:11px;margin-top:4px">
+      ${escapeHtml(st.loop_id)} · 控制器 ${escapeHtml(ctrl)} · 权限 ${escapeHtml(c.actuator.permission_mode)} ·
+      调度 ${escapeHtml(c.scheduler.mode)}/${escapeHtml(c.scheduler.interval_seconds)}s ·
+      执行器 ${escapeHtml(c.actuator.adapter)}
+    </div>`;
+}
+
+function renderStats(st){
+  const last = st.last_cycle;
+  const err = last && last.errors && last.errors[0];
+  const obs = Object.values(st.observations)[0] || {};
+  const ver = last ? last.verification_status : '-';
+  const verClass = verStatusCls(ver);
+  $('stats').innerHTML = `
+    <div class="box"><div class="k">观测值</div><div class="v">${fmt(obs.value)} <span class="muted" style="font-size:11px">${escapeHtml(obs.unit||'')}</span></div></div>
+    <div class="box"><div class="k">偏差</div><div class="v" style="color:${err&&Math.abs(err.error)>err.tolerance?'var(--bad)':'var(--ok)'}">${err?fmt(err.error,true):'-'}</div></div>
+    <div class="box"><div class="k">不确定性</div><div class="v">${last?fmt(last.uncertainty):'-'}</div></div>
+    <div class="box"><div class="k">本轮验证</div><div class="v"><span class="pill ${verClass}">${ver}</span></div></div>
+    <div class="box" style="min-width:200px"><div class="k">验证分布（本 loop 迄今全部动作）</div>
+      <div class="v" style="font-size:12px;font-weight:400;margin-top:2px">${verdictPills(last&&last.verification_summary)}</div></div>
+    <div class="box"><div class="k">人工复核</div><div class="v">${last&&last.human_review_required?'<span class="pill warn">需要</span>':'<span class="pill ok">否</span>'}</div></div>
+    <div class="box"><div class="k">周期数</div><div class="v">${st.history.length}</div></div>`;
+}
+
+/* verification_status 只是"本轮"的结论；累计分布看 verification_summary */
+const VERDICT_CLS = {improved:'ok', worsened:'bad', unchanged:'', failed:'bad',
+                     inconclusive:'warn', pending:'warn'};
+const VERDICT_ORDER = ['improved','worsened','unchanged','pending','inconclusive','failed'];
+
+function verStatusCls(s){
+  s = String(s||'');
+  if(s.startsWith('verified:')){
+    /* 复合值形如 verified:improved,worsened+action_pending，取最坏的 verdict */
+    if(s.indexOf('worsened')>=0||s.indexOf('failed')>=0) return 'bad';
+    if(s.indexOf('inconclusive')>=0||s.indexOf('unchanged')>=0) return 'warn';
+    return 'ok';
+  }
+  if(s==='failed'||s==='error') return 'bad';
+  if(s.startsWith('pending')||s.startsWith('blocked')||s==='awaiting_human') return 'warn';
+  return '';
+}
+
+function verdictPills(sum){
+  const s = sum || {};
+  const parts = VERDICT_ORDER.filter(k=>(s[k]||0)>0)
+    .map(k=>`<span class="pill ${VERDICT_CLS[k]||''}" title="本 loop 迄今 ${k} 的动作数">${k} ${s[k]}</span>`);
+  return parts.length ? parts.join(' ') : '<span class="pill muted">暂无结论</span>';
+}
+
+function fmt(v, sign){
+  if(v===null||v===undefined||Number.isNaN(v)) return '-';
+  const n = Number(v);
+  return (sign&&n>0?'+':'') + (Math.abs(n)>=100?n.toFixed(1):n.toFixed(2));
+}
+
+/* ---------------- 图表 ---------------- */
+function renderChart(st){
+  if(!chart){ chart = echarts.init($('chart'), 'dark'); window.addEventListener('resize',()=>chart.resize()); }
+  const hist = st.history || [];
+  const xs = hist.map((c,i)=> i+1 );
+  const obsSeries = [];
+  const errSeries = [];
+  const spSeries = [];
+  const marks = [];
+  const anomalies = [];
+
+  hist.forEach((c,i)=>{
+    const keys = Object.keys(c.observations||{});
+    const v = keys.length ? c.observations[keys[0]].value : null;
+    obsSeries.push(v);
+    const e = (c.errors&&c.errors[0]) ? c.errors[0].error : null;
+    errSeries.push(e);
+    const g = keys.length ? ((c.target||{})[Object.keys(c.target||{})[0]]||{}) : {};
+    spSeries.push(g.setpoint ? (g.setpoint.value!==null&&g.setpoint.value!==undefined ? g.setpoint.value : g.nominal) : null);
+    (c.executed_actions||[]).forEach(a=>{
+      if(a.executed || a.status==='pending_verification' || a.status==='verified'){
+        marks.push({xAxis:i+1, yAxis:v, name:a.status, source:a.source_type});
+      }
+    });
+    (c.anomalies||[]).forEach(a=>anomalies.push({x:i+1, a}));
+  });
+
+  const markPoints = marks.map(m=>({
+    coord:[m.xAxis,m.yAxis],
+    value:m.source,
+    itemStyle:{color: m.source==='ai_inference' ? '#bc8cff' : '#f0883e'},
+    label:{show:false}
+  }));
+  const anomalyPoints = anomalies.map(a=>({
+    xAxis:a.x, itemStyle:{color:'#f85149'}
+  }));
+
+  chart.setOption({
+    backgroundColor:'transparent',
+    grid:{left:52,right:24,top:36,bottom:34},
+    tooltip:{trigger:'axis'},
+    legend:{data:['观测值','目标值','误差'],textStyle:{color:'#8b949e'},top:4},
+    xAxis:{type:'category',data:xs,name:'周期',axisLine:{lineStyle:{color:'#2a3340'}},
+           axisLabel:{color:'#8b949e'}},
+    yAxis:[
+      {type:'value',name:'值',axisLine:{lineStyle:{color:'#2a3340'}},
+       splitLine:{lineStyle:{color:'#1c2230'}},axisLabel:{color:'#8b949e'}},
+      {type:'value',name:'误差',axisLine:{lineStyle:{color:'#2a3340'}},
+       splitLine:{show:false},axisLabel:{color:'#8b949e'}}
+    ],
+    series:[
+      {name:'观测值',type:'line',data:obsSeries,smooth:false,symbolSize:5,
+       lineStyle:{width:2,color:'#58a6ff'},itemStyle:{color:'#58a6ff'},
+       markPoint:{symbolSize:34,data:markPoints,
+         label:{show:true,formatter:p=>p.value==='ai_inference'?'AI':'','fontSize':9}},
+       markLine:{silent:true,data:anomalyPoints,symbol:['none','none'],
+         lineStyle:{color:'#f85149',type:'dotted'}}},
+      {name:'目标值',type:'line',data:spSeries,step:'end',symbol:'none',
+       lineStyle:{width:1.5,type:'dashed',color:'#3fb950'},itemStyle:{color:'#3fb950'}},
+      {name:'误差',type:'line',yAxisIndex:1,data:errSeries,symbol:'none',
+       lineStyle:{width:1,color:'#d29922'},itemStyle:{color:'#d29922'}}
+    ]
+  }, true);
+}
+
+/* ---------------- 审批 ---------------- */
+function renderPending(items){
+  $('pendingCount').textContent = items.length;
+  const body = $('pendingBody');
+  if(!items.length){ body.innerHTML = '<tr><td colspan="7" class="muted">无</td></tr>'; return; }
+  body.innerHTML = items.map(a=>{
+    const ai = a.source_type === 'ai_inference';
+    const p = (a.params||{}).value;
+    return `<tr>
+      <td class="mono">${a.id}</td>
+      <td><span class="pill ${ai?'guard':''}">${escapeHtml(a.source_type)}</span></td>
+      <td class="mono">${escapeHtml(a.target)}</td>
+      <td class="mono">${fmt(p)}</td>
+      <td class="mono">${escapeHtml(a.risk_level)}</td>
+      <td class="muted" style="font-size:11px">${escapeHtml(a.decision_reason||'')}</td>
+      <td style="white-space:nowrap">
+        <button class="ok" onclick="approve(${a.id})">通过</button>
+        <button class="bad" onclick="reject(${a.id})">驳回</button>
+      </td></tr>`;
+  }).join('');
+}
+
+async function approve(id){
+  try{ const r = await api('/api/actions/'+id+'/approve',{method:'POST'});
+       toast('已通过 ' + id + ' -> ' + ((r.action||{}).status||'?'));
+       loadState(); }catch(e){ toast('通过失败: '+e.message, true); }
+}
+async function reject(id){
+  try{ await api('/api/actions/'+id+'/reject',{method:'POST'});
+       toast('已驳回 ' + id); loadState(); }catch(e){ toast('驳回失败: '+e.message, true); }
+}
+
+/* ---------------- 时间线 ---------------- */
+function renderTimeline(history){
+  if(!history || !history.length){ $('timeline').innerHTML='<div class="muted">暂无</div>'; return; }
+  const rows = history.slice().reverse().map(c=>{
+    const err = c.errors && c.errors[0];
+    const acts = (c.executed_actions||[]).map(a=>`${a.status}`).join(',') || '-';
+    return `<div class="tl-item">
+      <span class="muted">${escapeHtml((c.started_at||'').replace('T',' ').slice(0,19))}</span>
+      <span>#${c.cycle_id}</span>
+      <span>e=${err?fmt(err.error,true):'-'} · ${c.should_intervene?'干预':'不干预'} ·
+        <span class="muted">${escapeHtml(acts)}</span> ·
+        <span class="pill ${verStatusCls(c.verification_status)}">${escapeHtml(c.verification_status)}</span>
+        ${verdictPills(c.verification_summary)}
+        ${c.human_review_required?'<span class="pill warn">复核</span>':''}
+      </span></div>`;
+  }).join('');
+  $('timeline').innerHTML = rows;
+}
+
+/* ---------------- 创建 ---------------- */
+function buildConfig(){
+  const json = $('f_json').value.trim();
+  if(json){ return JSON.parse(json); }
+  if(['mpc','adaptive_arx'].includes($('f_ctrl').value)){
+    throw new Error('MPC/Adaptive ARX 必须先填写专家 JSON（模型/执行器边界/实际输入来源）；可使用 SKILL 中的通用模板');
+  }
+  const sim = $('f_sim').checked;
+  const adapter = sim ? '__SIM__' : 'manual';
+  return {
+    name: $('f_name').value || '未命名回路',
+    enabled: false,
+    goals: [{
+      goal_id: 'g1',
+      target_variable: $('f_var').value,
+      direction: 'approach',
+      setpoint: {kind:'value', value: Number($('f_sp').value)},
+      tolerance: Number($('f_tol').value)
+    }],
+    observations: [{
+      metric_id: $('f_var').value,
+      source: sim ? '__SIM__' : 'manual',
+      unit: '',
+      freshness_limit: 30,
+      missing_policy: 'hold_last',
+      outlier_policy: 'flag'
+    }],
+    controller: {
+      kind: $('f_ctrl').value,
+      params: $('f_ctrl').value==='pid'
+        ? {kp:0.3,ki:0.0,kd:0.0,sample_time_seconds:Number($('f_interval').value)}
+        : {proportional_gain:0.5, deadband:0.3, hysteresis:0.3, cooldown_cycles:0}
+    },
+    scheduler: {mode:$('f_sched').value, interval_seconds:Number($('f_interval').value)},
+    actuator: {permission_mode:$('f_perm').value, adapter: adapter, max_step: 20},
+    verification: {delay_cycles:1, noise_k:2.0}
+  };
+}
+
+async function createLoop(){
+  try{
+    const cfg = buildConfig();
+    if($('f_json').value.trim()){
+      cfg.actuator = cfg.actuator || {};
+    }
+    // 需要模拟对象时先建
+    if(cfg.actuator && cfg.actuator.adapter === '__SIM__'){
+      const sim = await api('/api/sim/plants', {method:'POST', body:JSON.stringify({
+        tau:3.0, dead_time:1.0, noise_sigma:0.3, x0:0})});
+      cfg.actuator.adapter = sim.name;
+      cfg.observations.forEach(o=>{ if(o.source === '__SIM__') o.source = sim.name; });
+    }
+    cfg.observations.forEach(o=>{ if(o.source === '__SIM__') o.source = 'manual'; });
+    const r = await api('/api/loops', {method:'POST', body:JSON.stringify({config:cfg})});
+    toast('已创建 ' + r.loop_id);
+    currentLoop = r.loop_id;
+    await loadLoops(); await loadState();
+  }catch(e){ toast('创建失败: '+e.message, true); }
+}
+
+function fillExample(){
+  $('f_json').value = JSON.stringify({
+    name:"通用示例：区间目标 + 规则控制器",
+    enabled:false,
+    goals:[{goal_id:"g1",target_variable:"metric_1",direction:"approach",
+            setpoint:{kind:"range",low:48,high:52},tolerance:0,priority:3}],
+    observations:[{metric_id:"metric_1",source:"manual",unit:"dimensionless",freshness_limit:30,
+                   missing_policy:"hold_last",outlier_policy:"flag"}],
+    controller:{kind:"rule",params:{rules:[
+      {id:"r_low",if:{metric:"metric_1",op:"lt",value:48},
+       action:{value:60,risk:"medium",goal_id:"g1"},reason:"低于下限，调整执行量"},
+      {id:"r_high",if:{metric:"metric_1",op:"gt",value:52},
+       action:{value:40,risk:"medium",goal_id:"g1"},reason:"高于上限，调整执行量"}]}},
+    scheduler:{mode:"manual"},
+    actuator:{permission_mode:"require_approval",adapter:"manual"},
+    verification:{delay_cycles:1}
+  }, null, 2);
+}
+
+/* ---------------- 动作 ---------------- */
+async function runCycle(){
+  if(!currentLoop) return;
+  try{ await api('/api/loops/'+currentLoop+'/cycle',{method:'POST'});
+       await loadState(); }catch(e){ toast('跑周期失败: '+e.message, true); }
+}
+async function setEnabled(on){
+  if(!currentLoop) return;
+  try{ await api('/api/loops/'+currentLoop+'/'+(on?'start':'pause'),{method:'POST'});
+       await loadLoops(); await loadState(); }catch(e){ toast(e.message,true); }
+}
+
+async function health(){
+  try{
+    const h = await api('/api/health');
+    $('healthTag').textContent = `在线 · ${h.loops} 个回路 · ${h.utc.slice(11,19)}Z`;
+  }catch(e){ $('healthTag').textContent = '离线'; }
+}
+
+/* ---------------- 启动 ---------------- */
+$('createBtn').onclick = createLoop;
+$('exampleBtn').onclick = fillExample;
+$('runBtn').onclick = runCycle;
+$('startBtn').onclick = ()=>setEnabled(true);
+$('pauseBtn').onclick = ()=>setEnabled(false);
+$('refreshBtn').onclick = ()=>{ health(); loadLoops(); loadState(); };
+
+
+(async function init(){
+  await health(); await loadCapabilities(); await loadLoops();
+  if(!currentLoop){
+    const first = document.querySelector('.loop-item');
+    if(first){ currentLoop = first.dataset.id; await loadState(); }
+  }
+  refreshTimer = setInterval(async ()=>{ await health(); await loadLoops(); await loadState(); }, 3000);
+})();
+</script>
+<footer style="text-align:center;padding:18px;color:#8a8f9b;font:12px system-ui,sans-serif">Powered by FCC Control Studio — Chans (chenchen_wang@foxmail.com)</footer>
+</body>
+</html>

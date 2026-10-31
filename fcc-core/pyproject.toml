@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fcc"
+version = "1.5.0"
+description = "Universal control core, agent skill orchestration, and numerical methods"
+authors = [{name = "Chans", email = "chenchen_wang@foxmail.com"}]
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.11"
+dependencies = ["fastapi>=0.110,<1", "uvicorn>=0.27,<1", "pydantic>=2.6,<3", "numpy>=1.26,<3", "scipy>=1.12,<2"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10", "httpx>=0.27,<1"]
+
+[tool.setuptools]
+package-dir = { "fcc" = "src/fcc" }
+packages = ["fcc"]
+
+[tool.setuptools.package-data]
+fcc = ["web/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+filterwarnings = ["ignore::DeprecationWarning"]

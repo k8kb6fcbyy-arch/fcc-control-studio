@@ -1,0 +1,32 @@
+{
+  "name": "generic-loop",
+  "enabled": false,
+  "goals": [
+    {
+      "goal_id": "goal_1",
+      "target_variable": "metric_1",
+      "direction": "approach",
+      "setpoint": {"kind": "value", "value": 1.0},
+      "tolerance": 0.05,
+      "priority": 5,
+      "constraints": {}
+    }
+  ],
+  "observations": [
+    {
+      "metric_id": "metric_1",
+      "source": "manual",
+      "unit": "dimensionless",
+      "sampling_interval": 30,
+      "freshness_limit": 180,
+      "missing_policy": "skip",
+      "outlier_policy": "flag",
+      "valid_range": [0, 2]
+    }
+  ],
+  "controller": {"kind": "monitor", "params": {}, "strategy_version": 1},
+  "scheduler": {"mode": "manual", "interval_seconds": 30, "interval_unit": "second"},
+  "actuator": {"permission_mode": "suggest_only", "adapter": "manual", "timeout_seconds": 10, "max_retries": 0},
+  "verification": {"delay_cycles": 1, "delay_seconds": 0, "noise_k": 2},
+  "metadata": {"description": "neutral starter; change metric and target before production use"}
+}

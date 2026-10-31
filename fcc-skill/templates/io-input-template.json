@@ -1,0 +1,24 @@
+{
+  "loop_config": {
+    "name": "generic_control_loop",
+    "enabled": false,
+    "metadata": {"ui": "easy-v1.3"},
+    "goals": [
+      {
+        "goal_id": "g1",
+        "target_variable": "metric_1",
+        "direction": "approach",
+        "setpoint": {"kind": "value", "value": 100},
+        "tolerance": 5
+      }
+    ],
+    "observations": [
+      {"metric_id": "metric_1", "source": "manual", "value_type": "float", "unit": "", "freshness_limit": 180}
+    ],
+    "controller": {"kind": "monitor", "params": {}},
+    "scheduler": {"mode": "manual", "interval_seconds": 60},
+    "actuator": {"permission_mode": "suggest_only", "adapter": "manual"}
+  },
+  "observation": {"metric_id": "metric_1", "value": 85, "source_type": "human_input"},
+  "__instructions": "The numeric values are examples only. Pass loop_config to POST /api/loops as {config:loop_config}; pass observation to POST /api/loops/{loop_id}/observations. The top-level envelope is NOT itself a LoopConfig."
+}

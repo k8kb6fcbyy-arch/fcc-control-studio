@@ -1,0 +1,27 @@
+{
+  "name": "generic-mpc-kalman-demo-not-production",
+  "enabled": false,
+  "goals": [
+    {"goal_id":"g1","target_variable":"metric_1","direction":"approach",
+     "setpoint":{"kind":"value","value":2.0},"tolerance":0.05}
+  ],
+  "observations": [
+    {"metric_id":"metric_1","source":"manual","unit":"dimensionless",
+     "sampling_interval":1.0,"freshness_limit":3.0,"missing_policy":"skip","outlier_policy":"flag"}
+  ],
+  "controller": {
+    "kind":"mpc", "strategy_version":1,
+    "params":{
+      "model":{"A":[[0.8]],"B":[[0.2]],"C":[[1.0]],"D":[[0.0]],"sample_time":1.0},
+      "horizon":8, "Q":[[10.0]],"R":[[0.1]],"S":[[0.1]],"Qf":[[2.0]],
+      "u_min":[-5.0],"u_max":[5.0],"du_min":[-0.5],"du_max":[0.5],
+      "max_dt_error_ratio":0.25,
+      "kalman":{"Q":[[0.01]],"R":[[0.05]],"x0":[0.0],"P0":[[1.0]],"gate_nis":9.0}
+    }
+  },
+  "scheduler":{"mode":"manual","interval_seconds":1.0},
+  "actuator":{"permission_mode":"require_approval","adapter":"manual",
+              "action_range":[-5.0,5.0],"max_step":0.5,"max_retries":0},
+  "verification":{"delay_cycles":1,"delay_seconds":0.0,"noise_k":2.0},
+  "metadata":{"warning":"Numerical toy model only; replace matrices, covariance, sampling, limits and adapter with validated actual values. ManualAdapter has no real plant actuation and starts without a current value."}
+}

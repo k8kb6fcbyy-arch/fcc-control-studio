@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FCC 1.5 · AI 首次启动</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,-apple-system,"Segoe UI","PingFang SC",sans-serif;color:#192a36;background:#f5f7f9}
+*{box-sizing:border-box}body{margin:0}main{max-width:1040px;margin:0 auto;padding:48px 24px 64px}
+header{margin-bottom:30px}.eyebrow{font-size:12px;color:#6c7986;letter-spacing:.11em;font-weight:700}
+h1{font-size:clamp(28px,4.5vw,43px);line-height:1.2;margin:12px 0;color:#132c3d}p{line-height:1.75;color:#4a5b68}
+.lead{max-width:760px;font-size:16px}.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{border:1px solid #dbe3e9;border-radius:16px;background:#fff;padding:25px;box-shadow:0 8px 28px #19334408}
+h2{font-size:19px;margin:0 0 14px}.pill{display:inline-block;border:1px solid #cbd9e3;border-radius:30px;font-size:12px;color:#537087;padding:3px 10px;margin-bottom:17px}
+.step{display:flex;gap:10px;margin-top:13px;color:#384a58;font-size:14px;line-height:1.65}.index{border:1px solid #cad9e4;background:#f3f7fa;color:#2c536c;border-radius:50%;width:23px;height:23px;text-align:center;flex-shrink:0;font-size:12px;line-height:22px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}button,a.action{font:inherit;font-size:14px;cursor:pointer;border-radius:9px;padding:11px 14px;background:#183e53;color:white;text-decoration:none;border:1px solid #183e53}button.secondary,a.secondary{background:#fff;color:#1b475c;border-color:#bfd0da}
+.status{margin-top:22px;border-radius:13px;padding:18px 20px;background:#ecf2f6;border:1px solid #d7e3ea;line-height:1.7;font-size:14px}#statusSummary{font-weight:650;color:#213d50}
+pre{font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;background:#f3f6f8;border-radius:10px;padding:14px;white-space:pre-wrap;overflow-wrap:anywhere;color:#27404f}
+footer{margin-top:25px;color:#6d7f8c;font-size:12px}a.link{color:#246280} .note{font-size:13px;color:#687884;margin-top:16px}
+@media(max-width:700px){.cols{grid-template-columns:1fr}main{padding:30px 16px}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="eyebrow">FCC CONTROL STUDIO / BOOTSTRAP 1.5</div>
+<h1>从一个目标开始，建立可验证的持续反馈。</h1>
+<p class="lead">无需先理解控制算法。选择你正在使用的 AI 类型，系统会告诉你：应该提供哪些信息、当前可以真正运行哪些能力，以及哪些功能还需要部署。</p></header>
+<section class="cols" aria-label="选择使用方式">
+<div class="panel"><span class="pill">模式 A · 仅有聊天 AI</span><h2>把 SKILL 交给你的 AI</h2>
+<p>适合只能上传文件、没有本地终端或后台运行权限的 AI。</p>
+<div class="step"><span class="index">1</span><span>上传 <code>fcc-skill</code> 文件夹或整个整合包。</span></div>
+<div class="step"><span class="index">2</span><span>让 AI 读取 <code>SKILL.md</code>，逐项询问目标、测量、数据、反馈节拍和执行边界。</span></div>
+<div class="step"><span class="index">3</span><span>AI 生成计划和阶段复盘模板；后续需要你提供新数据，除非另外连接了真实的后台服务。</span></div>
+<div class="actions"><button id="copyChat">复制聊天 AI 启动指令</button></div>
+<p class="note">仅导入文档不会让聊天 AI 自动运行定时任务，也不会自动发送提醒。</p></div>
+<div class="panel"><span class="pill">模式 B · 能运行本地命令的 AI Agent</span><h2>检测环境并启动 Core</h2>
+<p>适合可以读取源码、运行 Python、访问本机 API 的编码代理。</p>
+<div class="step"><span class="index">1</span><span>执行只读检测命令，获取 JSON 能力报告。</span></div>
+<div class="step"><span class="index">2</span><span>只有用户明确授权后，才安装依赖、以前台方式启动本地服务。</span></div>
+<div class="step"><span class="index">3</span><span>打开向导，提交观测，安排周期检查并在本地收件箱查看报告。</span></div>
+<pre>python fcc-skill/scripts/fcc_bootstrap.py doctor --json</pre>
+<div class="actions"><button id="copyAgent">复制 Agent 启动指令</button><a class="action secondary" href="/setup">进入需求设置</a></div>
+<p class="note">服务器进程退出后，后台调度也会停止。要主动发送消息仍需独立通知连接。</p></div>
+</section>
+<section class="status" aria-live="polite"><div id="statusSummary">检查当前本地控制服务…</div><div id="statusDetail"></div>
+<div class="actions"><a class="action secondary" href="/easy">I/O 简易面板</a><a class="action secondary" href="/expert">专业控制面板</a><button id="refresh" class="secondary">重新检查</button></div></section>
+<footer>Powered by FCC Control Studio — Chans (chenchen_wang@foxmail.com) · Local prototype · <a class="link" href="/docs">API 文档</a></footer>
+</main>
+<script>
+const chatPrompt = `请阅读上传的 fcc-skill/SKILL.md。先判断你是否能执行命令、读取本地文件、访问 FCC 服务并持续运行；不能就明确降级为对话模式。随后逐阶段询问：目标、可验证指标、数据来源、观测与报告节拍、可调整因素和执行权限。只问缺失信息，不假设已安装 Core，不声称自动发送报告。请保留来源署名：FCC Control Studio — Chans。`;
+const agentPrompt = `请读取 fcc-skill/SKILL.md 与 references/bootstrap.md。先执行 python fcc-skill/scripts/fcc_bootstrap.py doctor --json，报告检测事实和未知的宿主权限；仅在我明确同意后，才执行 install --yes / serve --yes。随后使用本地 /start 和 /setup 引导配置，验证真实数据与调度器是否工作。不要暴露本地无认证 API 到公网，不要把本地报告当作已发送消息。保留 FCC Control Studio — Chans 署名。`;
+async function copy(value,button){try{await navigator.clipboard.writeText(value);button.textContent='已复制';}catch(_){button.textContent='复制失败，可手动选择文本';}}
+document.getElementById('copyChat').addEventListener('click',e=>copy(chatPrompt,e.currentTarget));
+document.getElementById('copyAgent').addEventListener('click',e=>copy(agentPrompt,e.currentTarget));
+async function refresh(){const summary=document.getElementById('statusSummary');const detail=document.getElementById('statusDetail');summary.textContent='检查中…';detail.textContent='';try{const r=await fetch('/api/bootstrap',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();summary.textContent=d.scheduler_running?'本地服务已启动；周期调度器正在运行':'本地服务已启动；周期调度器未运行';detail.textContent='观测适配器：'+(d.observation_adapters.length?d.observation_adapters.join('、'):'尚未接通自动观测源')+'。报告投递：本地收件箱。能否让 AI 主动联系你，取决于 AI 宿主与通知连接。';}catch(err){summary.textContent='无法获取当前状态';detail.textContent='请检查本机服务与浏览器连接：'+err.message;}}
+document.getElementById('refresh').addEventListener('click',refresh);refresh();
+</script>
+</body></html>

@@ -1,0 +1,33 @@
+# Python / local environment
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
+# Runtime data: do NOT publish
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+*.log
+*.pem
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+# Local IDE / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

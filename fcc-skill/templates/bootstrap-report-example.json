@@ -1,0 +1,15 @@
+{
+  "version": "1.5.0",
+  "mode": "conversation_only",
+  "core": {"source_present": false},
+  "service": {"reachable_fcc": false, "scheduler_running": false},
+  "ai_host": {
+    "has_file_access": "unknown",
+    "can_execute_commands": "unknown",
+    "can_access_loopback": "unknown",
+    "persistent_runtime": "unknown",
+    "can_proactively_message_user": "unknown"
+  },
+  "next_action": "先采集目标、指标、数据、反馈节拍与控制边界；确认能力后再部署。",
+  "source_credit": "FCC Control Studio — Chans (chenchen_wang@foxmail.com)"
+}

@@ -1,0 +1,21 @@
+{
+  "title": "Generic measurable objective",
+  "desired_outcome": "A user-defined outcome to improve or maintain",
+  "metric_name": "primary_metric",
+  "unit": "units",
+  "target_mode": "at_least",
+  "target_value": 100,
+  "tolerance": 2,
+  "data_source": "human_input",
+  "data_delivery": "manual",
+  "sampling_seconds": 3600,
+  "evaluation_seconds": 3600,
+  "report_seconds": 86400,
+  "sustained_samples": 3,
+  "controllable_levers": [],
+  "action_authority": "suggest",
+  "constraints": [],
+  "side_effect_metrics": [],
+  "verification_delay_seconds": 0,
+  "report_channel": "local_inbox"
+}
