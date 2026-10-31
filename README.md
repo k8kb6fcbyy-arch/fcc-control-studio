@@ -1,47 +1,10 @@
 # FCC Control Studio
 
-### Beyond Execution. Toward Continuous Improvement.
-
-**Define. Observe. Adjust. Verify.** · **定义目标 · 观察状态 · 调整策略 · 验证结果。**
-
-> Status: development framework / research prototype. The HTTP service is local-only and unauthenticated; do not expose it to the internet or use it for unvalidated physical automation.
-
-AI is changing how we interact with software.
-
-In the future, we may no longer need a separate app for every task. Instead, we could simply describe our goals, and AI agents would organize the tools needed to achieve them.
-
-But one important question remains:
-
-**How do we know whether AI is actually moving toward the goal? And how can it continuously improve?**
-
-This is what FCC Control Studio aims to address.
-
-FCC consists of two core components:
-
-- **AI Agent Skill:** Helps AI agents understand user requirements, define measurable goals, and configure monitoring, feedback cycles, and verification.
-- **FCC Engine:** Provides general-purpose feedback control capabilities, including state observation, error analysis, iterative adjustment, and outcome verification.
-
-FCC is designed to be independent of specific AI models, industries, or applications.
-
-It can support software quality improvement, workflow automation, industrial monitoring, and other measurable scenarios.
-
-FCC does not promise to achieve every goal automatically. Instead, it provides a framework for **clear objectives, reliable observations, controlled adjustments, and verifiable results.**
-
-**Moving AI beyond one-time execution toward continuous, verifiable improvement.**
-
-**FCC Control Studio**
-
-*Define. Observe. Adjust. Verify.*
-
-Created by Chans · Contact: chenchen_wang@foxmail.com
-
----
-
-## 中文
-
 ### 让 AI 不止于执行，更懂得反馈与改进。
 
-**定义目标 · 观察状态 · 调整策略 · 验证结果。**
+**定义目标 · 观察状态 · 调整策略 · 验证结果。** · **Define. Observe. Adjust. Verify.**
+
+> Status: development framework / research prototype. The HTTP service is local-only and unauthenticated; do not expose it to the internet or use it for unvalidated physical automation.
 
 AI 正在改变软件的使用方式。
 
@@ -74,6 +37,43 @@ Created by Chans · Contact: chenchen_wang@foxmail.com
 
 ---
 
+## English
+
+### Beyond Execution. Toward Continuous Improvement.
+
+**Define. Observe. Adjust. Verify.**
+
+AI is changing how we interact with software.
+
+In the future, we may no longer need a separate app for every task. Instead, we could simply describe our goals, and AI agents would organize the tools needed to achieve them.
+
+But one important question remains:
+
+**How do we know whether AI is actually moving toward the goal? And how can it continuously improve?**
+
+This is what FCC Control Studio aims to address.
+
+FCC consists of two core components:
+
+- **AI Agent Skill:** Helps AI agents understand user requirements, define measurable goals, and configure monitoring, feedback cycles, and verification.
+- **FCC Engine:** Provides general-purpose feedback control capabilities, including state observation, error analysis, iterative adjustment, and outcome verification.
+
+FCC is designed to be independent of specific AI models, industries, or applications.
+
+It can support software quality improvement, workflow automation, industrial monitoring, and other measurable scenarios.
+
+FCC does not promise to achieve every goal automatically. Instead, it provides a framework for **clear objectives, reliable observations, controlled adjustments, and verifiable results.**
+
+**Moving AI beyond one-time execution toward continuous, verifiable improvement.**
+
+**FCC Control Studio**
+
+*Define. Observe. Adjust. Verify.*
+
+Created by Chans · Contact: chenchen_wang@foxmail.com
+
+---
+
 ## Where FCC fits / 适用场景与局限性
 
 **English:** FCC is most useful when a goal has trustworthy observations, measurable outcomes, an identifiable way to influence results, and enough time to verify changes. Software quality, AI output evaluation and repeatable workflows can be good initial fits. Business strategy, market prediction, subjective goals and safety-critical interventions should not be delegated to unsupervised automatic control. Quantification is only one constraint: *goal validity, data quality, controllability, causal attribution, response delay and execution safety* also matter. **This release has no independently validated cross-domain success-rate claim.**
@@ -93,6 +93,15 @@ Created by Chans · Contact: chenchen_wang@foxmail.com
 - `fcc-core/src/fcc/web/start.html` — first-use landing page for chat-only and locally executable AI.
 - `SECURITY.md` — deployment limits and handling of private data.
 - `LICENSE`, `NOTICE`, `ATTRIBUTION.md` — conditions for copying, calling, integrating and crediting this project.
+
+## Related repositories / 相关仓库
+
+- **[fcc-control-studio](https://github.com/k8kb6fcbyy-arch/fcc-control-studio)** — 本仓库 · this repository. 完整版：Python 控制引擎、本地 API、Web UI，以及可执行的 agent Skill。
+- **[fcc-lite](https://github.com/k8kb6fcbyy-arch/fcc-lite)** — 轻量版 · lightweight edition. 只有 `SKILL.md`、`README.md`、`LICENSE`、`NOTICE` 四个文件，交给任何能读取文件的 AI 即可使用；不含引擎、界面或数据库。
+
+只想要「让 AI 按反馈闭环工作」的提示词，用 **fcc-lite** 就够；需要真实数值计算、状态估计与可视化，用**本仓库**。
+
+If you only need the prompt-level workflow, use **fcc-lite**. Use **this repository** when you need numerical computation, state estimation or visualisation.
 
 ## Quick start (Python 3.11+)
 
